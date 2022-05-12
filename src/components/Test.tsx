@@ -10,6 +10,7 @@ const ContainerDiv = (item) => {
     <div className="sub">
       <div className="title">{item.text}</div>
       <Container
+        id={item.id}
         col={4}
         position={position}
         dragEnabled={true}
@@ -43,6 +44,7 @@ export default function (props) {
   }, [data]);
   return (
     <Container
+      id="wrapper"
       col={6}
       position={position}
       dragEnabled={true}

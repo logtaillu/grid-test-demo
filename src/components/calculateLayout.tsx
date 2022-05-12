@@ -69,7 +69,7 @@ export const getXGridPos = (x, width, col) => {
   return xgrid;
 };
 
-const calculateLayout = (layoutRef, colRef) => (
+const calculateLayout = (layoutRef, colRef, id) => (
   grid: Muuri,
   layoutId: number,
   items: Muuri.Item[],
@@ -83,9 +83,9 @@ const calculateLayout = (layoutRef, colRef) => (
     slots: [],
     styles: {}
   };
+  console.log("to layout", id)
   var timerId = window.setTimeout(function () {
     // 实际内容
-    console.log("calculate Layout", layoutId);
     const positions = layoutRef.current || [];
     const posmap = {};
     positions.map((s) => (posmap[s.i] = s));
@@ -112,8 +112,9 @@ const calculateLayout = (layoutRef, colRef) => (
         ele
       };
     });
-    const height = placeLayout(ary, layout.slots, width);
-    layout.styles.height = height + "px";
+    const h = placeLayout(ary, layout.slots, width);
+    layout.styles.height = h + "px";
+    console.log("to layout", id, h);
     callback(layout);
   }, 100);
   return function () {

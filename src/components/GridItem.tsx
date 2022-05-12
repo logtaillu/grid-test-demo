@@ -32,8 +32,7 @@ export default function (props: React.PropsWithChildren<IGridItemProps>) {
       requestAnimationFrame(() => {
         update();
         if (grid.current) {
-          grid.current.refreshItems();
-          grid.current.layout();
+          grid.current.refreshItems().layout();
         }
       });
     },
@@ -47,8 +46,11 @@ export default function (props: React.PropsWithChildren<IGridItemProps>) {
   const divRef = useRef<HTMLDivElement | null>(null);
   const onHeightDetect = ({ offsetHeight }: any) => {
     if (heightRef.current !== offsetHeight && autoh) {
-      console.log("hchange", position.i);
+      console.log("hchange", position.i, offsetHeight);
       heightRef.current = offsetHeight;
+      if (divRef.current) {
+        divRef.current.style.height = offsetHeight + "px";
+      }
       refresh();
     }
   };

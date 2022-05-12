@@ -1,4 +1,4 @@
-const data = ["aaa" /**, "bbb", "ccc" */].map((text, idx) => ({
+const data = ["first" /**, "bbb", "ccc" */].map((text, idx) => ({
   id: text,
   type: "container",
   text: text,
@@ -11,25 +11,25 @@ const data = ["aaa" /**, "bbb", "ccc" */].map((text, idx) => ({
   },
   children:
     idx === 0
-      ? ["ax"].map((f, e) => ({
-          id: text + f,
+      ? ["second"].map((f, e) => ({
+          id: `${text}-${f}`,
           type: "container",
           text: f,
           layout: {
             w: 4,
             x: 0,
             y: e,
-            i: text + f
+            i: `${text}-${f}`
           },
-          children: ["axx", "bxx"].map((t, idd) => ({
-            id: text + f + t,
+          children: ["item1", "item2"].map((t, idd) => ({
+            id: `${text}-${f}-${t}`,
             type: "text",
             text: t,
             layout: {
               w: 2,
               x: idd * 2,
               y: 0,
-              i: text + f + t,
+              i:  `${text}-${f}-${t}`,
               h: 110,
               autoh: false
             }

@@ -17,10 +17,12 @@ interface IContainerProps extends GridOptions {
   col: number;
   resizeable?: boolean;
   position: Array<ILayout>;
+  id: string;
 }
 let grids: Muuri[] = [];
 export default function (props: React.PropsWithChildren<IContainerProps>) {
   const {
+    id,
     children,
     col,
     position,
@@ -38,7 +40,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
   useEffect(() => {
     if (divRef.current && !gridRef.current && size?.width) {
       gridRef.current = new Muuri(divRef.current, {
-        layout: calculateLayout(layoutRef, colRef),
+        layout: calculateLayout(layoutRef, colRef, id),
         dragStartPredicate: (item, event: any) => {
           if (event.target.classList.contains("react-resizable-handle")) {
             return false;
