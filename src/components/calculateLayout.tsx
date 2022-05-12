@@ -77,7 +77,7 @@ const calculateLayout = (layoutRef, colRef) => (
   height: number,
   callback: LayoutFunctionCallback
 ): LayoutFunction => {
-  var layout = {
+  var layout: any = {
     id: layoutId,
     items: items,
     slots: [],
@@ -90,13 +90,14 @@ const calculateLayout = (layoutRef, colRef) => (
     const posmap = {};
     positions.map((s) => (posmap[s.i] = s));
     const col = colRef.current;
-    const ary: ILayoutItem[] = (items || []).map((item, index) => {
-      const id = item.getElement()?.dataset?.id;
+    const ary: ILayoutItem[] = (items || []).map((item: any, index) => {
+      const id: string = item.getElement()?.dataset?.id || "";
       const ele = posmap[id];
       const dragging = item.isDragging();
       if (dragging && ele) {
-        ele.x = getXGridPos(item._tX, width, Number(col));
-        ele.ypos = item._tY;
+        const { _tX, _tY } = item;
+        ele.x = getXGridPos(_tX, width, Number(col));
+        ele.ypos = _tY;
       }
       const { x, y, ypos } = ele || {};
       const m = item.getMargin();

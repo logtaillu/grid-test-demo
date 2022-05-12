@@ -18,7 +18,7 @@ interface IContainerProps extends GridOptions {
   resizeable?: boolean;
   position: Array<ILayout>;
 }
-let grids = [];
+let grids: Muuri[] = [];
 export default function (props: React.PropsWithChildren<IContainerProps>) {
   const {
     children,
@@ -39,7 +39,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
     if (divRef.current && !gridRef.current && size?.width) {
       gridRef.current = new Muuri(divRef.current, {
         layout: calculateLayout(layoutRef, colRef),
-        dragStartPredicate: (item, event) => {
+        dragStartPredicate: (item, event: any) => {
           if (event.target.classList.contains("react-resizable-handle")) {
             return false;
           } else if (event.srcEvent.handled) {
@@ -56,6 +56,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
             );
           }
         },
+        layoutOnResize: false,
         // dragSortPredicate: (item, event) => {
         //   console.log(item.getGrid());
         //   return {
@@ -88,6 +89,12 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
       // });
     }
   }, [gridOptions, !!size?.width]);
+  // 在宽度resize的时候重新执行布局，用于内部嵌套
+  useEffect(() => {
+    if (gridRef.current) {
+      gridRef.current.layout();
+    }
+  }, [size?.width || 0]);
   return (
     <div className="grid" ref={divRef}>
       {React.Children.map(props.children, (child, index) => {
