@@ -67,28 +67,26 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
         //     migrateAction: "move"
         //   };
         // },
-        // dragSort: () => grids,
+        dragSort: () => grids.slice(1),
         ...gridOptions
-      });
-      const grid = gridRef.current;
-      grids.push(grid);
-      grid.on("dragStart", function (item, event) {
+      }).on("dragStart", function (item, event) {
         if (event.target.classList.contains("react-resizable-handle")) {
           event.srcEvent.preventDefault();
         }
-      });
-      grid.on("dragMove", function (item, event) {
+      }).on("dragMove", function (item, event) {
         // 实际内容
         grid.layout();
-        // console.log("dragmove");
+      }).on("dragReleaseEnd", (item) => {
+        const g = item.getGrid();
+        if (g) {
+          const fromid = item.getElement()?.dataset.grid;
+          const toid = g.getElement()?.dataset.grid;
+          console.log(`from ${fromid} to ${toid}`);
+          g.refreshItems([item]);
+        }
       });
-      // grid.on("dragReleaseEnd", function (item) {
-      //   console.log("dragmove");
-      //   grid.layout();
-      // });
-      // grid.on("layoutEnd", function (items) {
-      //   console.log("layoutEnd", items);
-      // });
+      const grid = gridRef.current;
+      grids.push(grid);
     }
   }, [gridOptions, !!size?.width]);
   // 在宽度resize的时候重新执行布局，用于内部嵌套
@@ -98,7 +96,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
     }
   }, [size?.width || 0]);
   return (
-    <div className="grid" ref={divRef}>
+    <div className={"grid " + id} ref={divRef} data-grid={id}>
       {React.Children.map(props.children, (child, index) => {
         return (
           <GridItem
@@ -108,6 +106,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
             col={col}
             resizeable={resizeable}
             grid={gridRef}
+            gridId={id}
           >
             {child}
           </GridItem>

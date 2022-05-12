@@ -64,6 +64,7 @@ const placeLayout = (ary: ILayoutItem[], slots: number[], width: number) => {
 export const getXGridPos = (x, width, col) => {
   // 向前最接近
   // grid <= (x*col)/w
+  x = isNaN(x) ? 0 : x;
   let xgrid = parseInt(((x * col) / width).toFixed(0), 10);
   xgrid = Math.min(Math.max(0, xgrid), col);
   return xgrid;
@@ -83,7 +84,7 @@ const calculateLayout = (layoutRef, colRef, id) => (
     slots: [],
     styles: {}
   };
-  console.log("to layout", id)
+  // console.log("to layout", id)
   var timerId = window.setTimeout(function () {
     // 实际内容
     const positions = layoutRef.current || [];
@@ -114,7 +115,7 @@ const calculateLayout = (layoutRef, colRef, id) => (
     });
     const h = placeLayout(ary, layout.slots, width);
     layout.styles.height = h + "px";
-    console.log("to layout", id, h);
+    // console.log("to layout", id, h);
     callback(layout);
   }, 100);
   return function () {

@@ -1,4 +1,4 @@
-const data = ["first" /**, "bbb", "ccc" */].map((text, idx) => ({
+const data = ["first", "board1","board2"].map((text, idx) => ({
   id: text,
   type: "container",
   text: text,
@@ -36,14 +36,14 @@ const data = ["first" /**, "bbb", "ccc" */].map((text, idx) => ({
           }))
         }))
       : ["sub1", "sub2", "sub3", "sub4"].map((t, idd) => ({
-          id: text + idd,
+          id: `${text}-${t}`,
           type: "text",
           text: t,
           layout: {
             w: 4,
             x: 0,
             y: idd,
-            i: text + idd,
+            i: `${text}-${t}`,
             h: 100
           }
         }))

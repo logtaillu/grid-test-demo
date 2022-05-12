@@ -13,10 +13,11 @@ interface IGridItemProps {
   col: number;
   resizeable?: boolean;
   grid: React.MutableRefObject<Muuri | null>;
+  gridId: string;
 }
 
 export default function (props: React.PropsWithChildren<IGridItemProps>) {
-  const { w, position, col, resizeable, grid } = props;
+  const { w, position, col, resizeable, grid, gridId } = props;
   const realw = Math.min(position.w, col);
   const calcPx = (wgrid: number) => {
     return Math.floor((w * wgrid) / col)
@@ -46,7 +47,7 @@ export default function (props: React.PropsWithChildren<IGridItemProps>) {
   const divRef = useRef<HTMLDivElement | null>(null);
   const onHeightDetect = ({ offsetHeight }: any) => {
     if (heightRef.current !== offsetHeight && autoh) {
-      console.log("hchange", position.i, offsetHeight);
+      // console.log("hchange", position.i, offsetHeight);
       heightRef.current = offsetHeight;
       if (divRef.current) {
         divRef.current.style.height = offsetHeight + "px";
@@ -76,6 +77,7 @@ export default function (props: React.PropsWithChildren<IGridItemProps>) {
     <div
       className="item"
       data-id={position.i}
+      data-grid={gridId}
       style={{
         width: width + "px",
         height: autoh ? (heightRef.current || "auto") : position.h + "px"
@@ -85,12 +87,12 @@ export default function (props: React.PropsWithChildren<IGridItemProps>) {
       <ResizableBox
         width={width}
         height={autoh ? heightRef.current : position.h || 0}
-        resizeHandles={resize ? (autoh ? ["w", "e"] : ["se"]) : []}
+        resizeHandles={resize ? (autoh ? ["w", "e"] : ["se", "w","e","s","n"]) : []}
         onResize={onResize}
         maxConstraints={[maxw, Infinity]}
         minConstraints={[minw, 10]}
         onResizeStop={(e, data) => {
-          console.log("resize end", position.i);
+          // console.log("resize end", position.i);
           onResize(e, data, true);
         }}
       >
