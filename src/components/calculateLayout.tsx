@@ -43,7 +43,7 @@ const placeRect = (
   }
   rects.push({ x: xpos, y: ypos, w, h, i });
   if (ele) {
-    ele.ypos = ypos;
+    ele.y = ypos;
   }
   return Math.max(height, ypos + h);
 };
@@ -69,8 +69,50 @@ export const getXGridPos = (x, width, col) => {
   xgrid = Math.min(Math.max(0, xgrid), col);
   return xgrid;
 };
+export const LayoutMap = new Map();
+// get position from map
+const getPosition = (gridId) => {
+  const layout = LayoutMap.get(gridId) || {};
+  const ary = layout.data || [];
+  return ary;
+}
 
-const calculateLayout = (layoutRef, colRef, id) => (
+const getPositionMap = (gridId) => {
+  const ary = getPosition(gridId);
+  const map = {};
+  ary.map(s => map[s.id] = s.layout);
+  return map;
+}
+const getItemConfig = (gridId, itemId) => {
+  const ary = getPosition(gridId);
+  const item = ary.find(s => s.id === itemId);
+  return item && item.layout;
+}
+
+export const switchItem = (item: Muuri.Item) => {
+  const g = item.getGrid();
+  if (!g) {
+    return;
+  }
+    const fromid = item.getElement()?.dataset.grid;
+    const toid = g.getElement()?.dataset.grid;
+    if (fromid !== toid) {
+      const frompos = getPosition(fromid);
+      const topos = getPosition(toid);
+      const ele = item.getElement();
+      const id = ele?.dataset.id;
+      const idx = frompos.findIndex(s => s.id === id);
+      if (idx >= 0) {
+        const itemPos = frompos.splice(idx, 1);
+        topos.push(itemPos[0]);
+      }
+      if (ele) {
+        ele.dataset.grid = toid;
+      }
+    }
+    g.refreshItems([item]);
+}
+const calculateLayout = (id) => (
   grid: Muuri,
   layoutId: number,
   items: Muuri.Item[],
@@ -87,26 +129,29 @@ const calculateLayout = (layoutRef, colRef, id) => (
   // console.log("to layout", id)
   var timerId = window.setTimeout(function () {
     // 实际内容
-    const positions = layoutRef.current || [];
-    const posmap = {};
-    positions.map((s) => (posmap[s.i] = s));
-    const col = colRef.current;
-    const ary: ILayoutItem[] = (items || []).map((item: any, index) => {
+    const curlayout = LayoutMap.get(id) || {};
+    const posmap = getPositionMap(id);
+    const col = curlayout.col;
+    const ary: ILayoutItem[] = (items || []).map((item, index) => {
       const id: string = item.getElement()?.dataset?.id || "";
-      const ele = posmap[id];
+      const gridId: string = item.getElement()?.dataset?.grid || "";
+      const ele = posmap[id] || getItemConfig(gridId, id);
       const dragging = item.isDragging();
       if (dragging && ele) {
-        const { _tX, _tY } = item;
-        ele.x = getXGridPos(_tX, width, Number(col));
-        ele.ypos = _tY;
+        const gridRect = grid.getElement().getBoundingClientRect();
+        const itemRect = item.getElement()?.getBoundingClientRect() || {x:0,y:0};
+        const relativeX = itemRect.x - gridRect.x;
+        const relativeY = itemRect.y - gridRect.y;
+        ele.x = getXGridPos(relativeX, width, Number(col));
+        ele.y = relativeY;
       }
-      const { x, y, ypos } = ele || {};
+      const { x, y, w: wgrid } = ele || {};
       const m = item.getMargin();
-      const w = item.getWidth() + m.left + m.right;
+      const w = Math.floor((width * Math.min(wgrid, col)) / col);
       const h = item.getHeight() + m.top + m.bottom;
       return {
         x: Math.floor((width * Number(x)) / Number(col)),
-        y: isNaN(Number(ypos)) ? Number(y) : Number(ypos),
+        y: Number(y),
         h,
         i: index,
         w,
@@ -115,7 +160,6 @@ const calculateLayout = (layoutRef, colRef, id) => (
     });
     const h = placeLayout(ary, layout.slots, width);
     layout.styles.height = h + "px";
-    // console.log("to layout", id, h);
     callback(layout);
   }, 100);
   return function () {
