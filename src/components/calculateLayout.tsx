@@ -70,6 +70,15 @@ export const getXGridPos = (x, width, col) => {
   return xgrid;
 };
 export const LayoutMap = new Map();
+// map存值
+export const setLayoutMap = (id, value) => {
+  if (LayoutMap.has(id)) {
+    const item = LayoutMap.get(id);
+    LayoutMap.set(id, { ...item, ...value });
+  } else {
+    LayoutMap.set(id, value);
+  }
+}
 // get position from map
 const getPosition = (gridId) => {
   const layout = LayoutMap.get(gridId) || {};

@@ -3,7 +3,7 @@ import Muuri, { GridOptions } from "muuri";
 import GridItem from "./GridItem";
 import { useSize, useUpdate } from "ahooks";
 import calculateLayout, { switchItem } from "./calculateLayout";
-import { LayoutMap } from "./calculateLayout";
+import { LayoutMap, setLayoutMap } from "./calculateLayout";
 import RenderItem from "./RenderItem";
 import ResizeObserver from "rc-resize-observer";
 export interface ILayout {
@@ -68,7 +68,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
         //     migrateAction: "move"
         //   };
         // },
-        dragSort: () => grids.slice(-2),
+        dragSort: () => grids,
         ...gridOptions
       }).on("dragStart", function (item, event) {
         if (event.target.classList.contains("react-resizable-handle")) {
@@ -81,7 +81,9 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
         switchItem(item);
       });
       const grid = gridRef.current;
-      grids.push(grid);
+      if (["board1","board2"].includes(id)) {
+        grids.push(grid);
+      }
     }
   }, [gridOptions, !!wref.current]);
   // 在宽度resize的时候重新执行布局，用于内部嵌套
