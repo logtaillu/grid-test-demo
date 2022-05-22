@@ -104,7 +104,7 @@ export const switchItem = (item: Muuri.Item) => {
     return;
   }
     const fromid = item.getElement()?.dataset.grid;
-    const toid = g.getElement()?.dataset.grid;
+    const toid = g.getElement()?.dataset.container;
     if (fromid !== toid) {
       const frompos = getPosition(fromid);
       const topos = getPosition(toid);
@@ -118,6 +118,8 @@ export const switchItem = (item: Muuri.Item) => {
       if (ele) {
         ele.dataset.grid = toid;
       }
+      // const fromupdate= LayoutMap.get(fromid).update;
+      // fromupdate();
     }
     g.refreshItems([item]);
 }

@@ -6,3 +6,13 @@
     b. 嵌套不同级容器
 4. responsive
 5. drag from out
+
+https://github.com/clauderic/dnd-kit
+https://5fc05e08a4a65d0021ae0bf2-gngonedmxi.chromatic.com/?path=/story/core-droppable-usedroppable--collision-detection-algorithms
+https://5fc05e08a4a65d0021ae0bf2-gngonedmxi.chromatic.com/?path=/docs/presets-sortable-multiple-containers--basic-setup
+可能可以做drag/drop容器，处理多级嵌套的问题，前提是并存
+dnd kit=>容器
+muuri:布局
+最好能依靠本身处理所有问题
+=>重写dragSortPredicate
+=>移动后清除缓存

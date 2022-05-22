@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import Muuri, { GridOptions } from "muuri";
 import GridItem from "./GridItem";
 import { useSize, useUpdate } from "ahooks";
@@ -6,6 +6,7 @@ import calculateLayout, { switchItem } from "./calculateLayout";
 import { LayoutMap, setLayoutMap } from "./calculateLayout";
 import RenderItem from "./RenderItem";
 import ResizeObserver from "rc-resize-observer";
+import { dragSort, grids } from "./dragSortPredicate";
 export interface ILayout {
   w: number;
   x: number;
@@ -21,8 +22,8 @@ interface IContainerProps extends GridOptions {
   resizeable?: boolean;
   data: any[];
   id: string;
+  level?: number;
 }
-let grids: Muuri[] = [];
 export default function (props: React.PropsWithChildren<IContainerProps>) {
   const {
     id,
@@ -31,13 +32,22 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
     data,
     resizeable,
     dragStartPredicate,
+    dragSortPredicate,
     ...gridOptions
   } = props;
   const divRef = useRef<HTMLDivElement | null>(null);
   const gridRef = useRef<Muuri | null>(null);
   const wref = useRef(0);
   const update = useUpdate();
-  LayoutMap.set(id, { data, col });
+  const [childs] = useState<any[]>(data.concat([]));
+  LayoutMap.set(id, {
+    data,
+    col,
+    wref,
+    resizeable,
+    grid: gridRef,
+    update
+  });
   useEffect(() => {
     if (divRef.current && !gridRef.current && !!wref.current) {
       gridRef.current = new Muuri(divRef.current, {
@@ -68,7 +78,7 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
         //     migrateAction: "move"
         //   };
         // },
-        dragSort: () => grids,
+        dragSort,
         ...gridOptions
       }).on("dragStart", function (item, event) {
         if (event.target.classList.contains("react-resizable-handle")) {
@@ -81,9 +91,9 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
         switchItem(item);
       });
       const grid = gridRef.current;
-      if (["board1","board2"].includes(id)) {
-        grids.push(grid);
-      }
+      // if (["board1","board2"].includes(id)) {
+      grids[id] = grid;
+      // }
     }
   }, [gridOptions, !!wref.current]);
   // 在宽度resize的时候重新执行布局，用于内部嵌套
@@ -106,16 +116,12 @@ export default function (props: React.PropsWithChildren<IContainerProps>) {
   }
   return (
     <ResizeObserver onResize={onResize}>
-      <div className={"grid " + id} ref={setRef} data-grid={id}>
-        {(data || []).map((child, index) => {
+      <div className={"grid " + id} ref={setRef} data-container={id}>
+        {(childs || []).map((child, index) => {
           return (
             <GridItem
-              key={index}
-              w={wref.current || 0}
+              key={child.id}
               position={child.layout}
-              col={col}
-              resizeable={resizeable}
-              grid={gridRef}
               gridId={id}
             >
               <RenderItem item={child} />

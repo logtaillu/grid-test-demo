@@ -1,4 +1,4 @@
-const data = ["first", "board1","board2"].map((text, idx) => ({
+const data = ["first","board1","board2"].map((text, idx) => ({
   id: text,
   type: "container",
   text: text,
@@ -10,7 +10,7 @@ const data = ["first", "board1","board2"].map((text, idx) => ({
     h: 400
   },
   children:
-    idx === 0
+  text === "first"
       ? ["second"].map((f, e) => ({
           id: `${text}-${f}`,
           type: "container",
